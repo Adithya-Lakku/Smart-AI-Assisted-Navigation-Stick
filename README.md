@@ -3,7 +3,6 @@ V# Smart AI-Assisted Navigation Stick for Visually Impaired Users
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Platform: Raspberry Pi 3B+](https://img.shields.io/badge/Platform-Raspberry%20Pi%203B%2B-red.svg?logo=raspberry-pi&logoColor=white)](https://www.raspberrypi.com/)
 [![Computer Vision: YOLOv11n](https://img.shields.io/badge/Vision-YOLOv11n-00FFFF.svg?logo=opencv&logoColor=white)](https://github.com/ultralytics/ultralytics)
-[![LLM: llama.cpp 4-bit](https://img.shields.io/badge/VLM-llama.cpp%204--bit%20(gemma4%3Ae4b)-orange.svg)](https://github.com/ggerganov/llama.cpp)
 [![TTS: PiperTTS](https://img.shields.io/badge/TTS-PiperTTS%20(%3C150ms)-green.svg)](https://github.com/rhasspy/piper)
 [![Framework: Flask](https://img.shields.io/badge/Framework-Flask-lightgrey.svg?logo=flask&logoColor=white)](https://palletsprojects.com/p/flask/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -17,7 +16,6 @@ A distributed edge AI mobility system combining real-time spatial computer visio
 - [Overview](#overview)
 - [Key Features](#key-features)
 - [System Architecture](#system-architecture)
-- [Hardware Wiring & Pinout](#hardware-wiring--pinout)
 - [End-to-End Latency Benchmark](#end-to-end-latency-benchmark)
 - [Repository Structure](#repository-structure)
 - [Installation & Setup](#installation--setup)
@@ -38,7 +36,7 @@ Traditional white canes identify physical obstacles only upon direct mechanical 
 
 1. **Continuous Edge Obstacle-Monitoring**: Fuses an HC-SR04 ultrasonic rangefinder with YOLOv11n directional spatial zoning, driving dual acoustic (buzzer) and tactile (vibration motor) alerts in real time.
 2. **Interruptible Guidance Loop**: A tactile pushbutton triggers on-demand contextual scene captioning, temporarily silencing obstacle alarms so the user receives clear spoken navigation instructions via earphones.
-3. **Local Multimodal Inference**: Replaces high-latency cloud pipelines with a 4-bit quantized multimodal model (`gemma4:e4b` / Gemma-VLM) hosted on a local workstation server via `llama.cpp`. This drops end-to-end processing latency by over **50%** (from **6–8 seconds down to under 3 seconds**), ensuring complete privacy with zero cloud dependency.
+3. **Local Multimodal Inference**: Replaces high-latency cloud pipelines with a 4-bit quantized multimodal model (`gemma-3-4b-it-GGUF:Q4_K_M`) hosted on a local workstation server via `llama.cpp`. This drops end-to-end processing latency by over **50%** (from **6–8 seconds down to under 3 seconds**), ensuring complete privacy with zero cloud dependency.
 4. **Sub-150ms Neural Speech Synthesis**: Synthesizes natural spoken navigational directions using PiperTTS directly into the user's earphones.
 
 ---
@@ -94,49 +92,31 @@ graph TD
     GUIDE -->|Play Guidance| EAR
 ```
 
----
-
-## Hardware Wiring & Pinout
-
-The system runs on a **Raspberry Pi 3B+** powered via a 5V/2.5A battery pack. Peripherals interface with the 40-pin GPIO header:
-
-| Peripheral | Component Pin | Raspberry Pi Pin (BCM) | Physical Header Pin | Notes |
-|---|---|---|---|---|
-| **Ultrasonic Sensor (HC-SR04)** | VCC | 5V Power | Pin 2 | Requires 5V supply |
-| | GND | Ground | Pin 6 | Common ground |
-| | TRIG | GPIO 23 | Pin 16 | 10 µs trigger pulse |
-| | ECHO | GPIO 24 | Pin 18 | Voltage divider (1kΩ / 2kΩ) to 3.3V |
-| **Active Buzzer** | VCC (+) | GPIO 18 | Pin 12 | Driven via 2N2222 NPN transistor |
-| | GND (-) | Ground | Pin 14 | |
-| **Vibration Motor (Haptic)** | Positive (+) | GPIO 25 | Pin 22 | Driven via NPN transistor + flyback diode |
-| | Negative (-) | Ground | Pin 20 | |
-| **Tactile Pushbutton** | Terminal A | GPIO 17 | Pin 11 | Internal pull-up (`PUD_UP`), active-low |
-| | Terminal B | Ground | Pin 9 | Connects to GND on press |
-| **Webcam** | USB 2.0 | USB Port | USB Bus | 640x480 resolution @ 30 FPS |
-| **Audio Feedback** | 3.5mm TRS | Audio Jack | Analog Out | Wired earphones or Bluetooth DAC |
 
 ---
 
 ## End-to-End Latency Benchmark
 
 The local multimodal inference server achieves a **~50–65% reduction in total end-to-end response time** compared with the cloud baseline pipeline:
-
-```
+```text
 ==============================================================================
                SMART BLIND STICK - LATENCY EVALUATION BENCHMARK
 ==============================================================================
-Metric / Pipeline Phase             | Cloud Baseline     | Local llama.cpp
+Metric / Pipeline Phase             | Cloud (Gemini + gTTS) | Local (YOLO + Ollama)
 ------------------------------------------------------------------------------
-Image Transmission (Upload)         |      323.3 ms     |       13.5 ms
-Vision Preprocessing (YOLOv11n)     | N/A (Cloud VLM)   |       38.2 ms
-Multimodal VLM Inference            |     4552.6 ms     |     2154.8 ms
-Speech Synthesis (TTS)              |     1772.7 ms (gTTS)|      124.3 ms (Piper)
-Audio Download                      |      399.6 ms     |       11.9 ms
+Image Transmission                  |      323.3 ms         |       13.5 ms
+Vision Preprocessing (YOLOv11n)     |      N/A              |       38.2 ms
+Vision-Language Inference (Gemini)  |     4552.6 ms         |       N/A
+Text-based LLM Inference (Ollama)   |      N/A              |     2154.8 ms
+Speech Synthesis                    |     1772.7 ms (gTTS)  |      124.3 ms (Piper)
+Audio Download / Delivery           |      399.6 ms         |       11.9 ms
 ------------------------------------------------------------------------------
-TOTAL END-TO-END LATENCY            |       7.05 s      |       2.34 s
+TOTAL END-TO-END LATENCY            |       7.05 s          |       2.34 s
 ==============================================================================
-RESULTS: 66.8% Latency Reduction (from ~7.05s down to ~2.34s)
-SPEEDUP: 3.01x faster guidance with 100% offline edge privacy
+RESULTS: 66.76% Lower End-to-End Latency
+SPEEDUP: 3.01x faster local guidance
+PRIVACY: Fully offline local inference pipeline
+==============================================================================
 ```
 
 To run this benchmark evaluation directly on your machine:
@@ -178,7 +158,7 @@ Smart-Blind-Stick/
 ├── server/                        # Local Edge AI Inference Server
 │   ├── __init__.py
 │   ├── app.py                     # Flask REST API (/upload, /audio, /status, /say)
-│   ├── llm_engine.py              # llama.cpp 4-bit VLM engine + Gemini fallback
+│   ├── llm_engine.py              # llama.cpp 4-bit llm engine
 │   ├── tts_engine.py              # Sub-150ms PiperTTS neural synthesizer
 │   ├── vision_pipeline.py         # YOLOv11n spatial zoning & corridor reasoning
 │   └── run_server.sh              # Server startup script
@@ -187,7 +167,7 @@ Smart-Blind-Stick/
 │   ├── __init__.py
 │   ├── detector.py                # YOLOv11n model loader & class filtering
 │   ├── spatial_reasoning.py       # 3-Zone horizontal corridor & threat scoring
-│   └── scene_builder.py           # Natural language prompt generator for VLM
+│   └── scene_builder.py           # Natural language prompt generator for LLM
 │
 ├── benchmarks/                    # Latency Profiling Suite
 │   ├── __init__.py
@@ -222,7 +202,7 @@ cd Smart-Blind-Stick
 pip install -r requirements.txt
 
 # (Optional) Download quantized GGUF multimodal model for llama.cpp:
-# Example: gemma4:e4b or Gemma-VLM GGUF
+# Example: gemma-3-4b-it-GGUF:Q4_K_M
 mkdir -p models
 # Download your preferred GGUF and vision projector into models/
 
@@ -366,7 +346,3 @@ pytest tests/ -v
 ```
 
 ---
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
