@@ -1,0 +1,27 @@
+# Smart AI Navigation Stick - Server & Workstation Requirements
+
+# Core Web & API Framework
+Flask>=3.0.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+PyYAML>=6.0.1
+pydantic>=2.5.0
+
+# Computer Vision & Spatial Object Detection (YOLOv11n)
+ultralytics>=8.3.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+
+# Local Multimodal Inference (llama.cpp)
+# Note: Can also use standalone llama-server binary or llama-cpp-python
+llama-cpp-python>=0.3.0
+
+# Local Speech Synthesis (PiperTTS - Sub-150ms Neural TTS)
+piper-tts>=1.2.0
+
+# Cloud Fallback & Benchmarking Comparison Pipeline
+google-generativeai>=0.8.0
+gTTS>=2.5.0
+
+# Testing & Linting
+pytest>=7.4.0

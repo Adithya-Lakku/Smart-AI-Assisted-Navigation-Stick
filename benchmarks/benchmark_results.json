@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-10-30 16:27:59",
+  "cloud_pipeline": {
+    "pipeline": "Cloud Multimodal (Gemini 2.5 Flash + gTTS)",
+    "network_upload_ms": 323.3,
+    "vision_llm_inference_ms": 4552.6,
+    "tts_synthesis_ms": 1772.7,
+    "network_download_ms": 399.6,
+    "total_latency_ms": 7048.2,
+    "total_latency_sec": 7.05
+  },
+  "local_pipeline": {
+    "pipeline": "Local Edge (YOLOv11n + llama.cpp 4-bit + PiperTTS)",
+    "yolo_vision_ms": 38.2,
+    "network_upload_ms": 13.5,
+    "vision_llm_inference_ms": 2154.8,
+    "tts_synthesis_ms": 124.3,
+    "network_download_ms": 11.9,
+    "total_latency_ms": 2342.7,
+    "total_latency_sec": 2.34
+  },
+  "latency_reduction_percent": 66.8,
+  "speedup_factor": 3.01
+}

@@ -1,0 +1,18 @@
+[Unit]
+Description=Smart AI Navigation Stick - Local Multimodal Inference Server
+After=network.target
+
+[Service]
+Type=simple
+User=server
+WorkingDirectory=/opt/Smart-Blind-Stick
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=/opt/Smart-Blind-Stick/.env
+ExecStart=/usr/bin/python3 -m server.app
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

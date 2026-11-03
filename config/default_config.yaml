@@ -1,0 +1,67 @@
+server:
+  host: "0.0.0.0"
+  port: 5000
+  debug: false
+  cooldown_seconds: 3.0
+  audio_ttl_seconds: 60
+  save_captures: true
+  captures_dir: "captures"
+  audio_dir: "audio_files"
+
+edge:
+  server_url: "http://192.168.1.100:5000"
+  camera_index: 0
+  frame_width: 640
+  frame_height: 480
+  simulate_hardware: false
+  continuous_monitoring_interval_sec: 0.15
+
+hardware:
+  pins:
+    trigger: 23
+    echo: 24
+    buzzer: 18
+    vibration: 25
+    button: 17
+  thresholds:
+    critical_distance_cm: 40.0
+    warning_distance_cm: 80.0
+    safe_distance_cm: 150.0
+  haptic:
+    pulse_fast_ms: 80
+    pulse_slow_ms: 250
+
+vision:
+  model_name: "yolo11n.pt"
+  confidence_threshold: 0.35
+  zones:
+    left_boundary_ratio: 0.33
+    right_boundary_ratio: 0.66
+  depth_estimation:
+    near_ratio: 0.40
+    medium_ratio: 0.20
+
+inference:
+  mode: "local"  # "local" (llama.cpp) | "cloud" (gemini) | "mock"
+  llama_cpp:
+    model_path: "models/gemma-4b-it-q4_k_m.gguf"
+    mmproj_path: "models/gemma-mmproj-f16.gguf"
+    server_url: "http://127.0.0.1:8080"
+    temperature: 0.2
+    max_tokens: 150
+    threads: 4
+    n_gpu_layers: 33
+  gemini:
+    model: "gemini-2.5-flash"
+    temperature: 0.2
+    max_tokens: 200
+
+tts:
+  engine: "piper"  # "piper" | "gtts" | "mock"
+  piper:
+    model_path: "models/en_US-lessac-medium.onnx"
+    config_path: "models/en_US-lessac-medium.onnx.json"
+    sample_rate: 22050
+  gtts:
+    language: "en"
+    slow: false

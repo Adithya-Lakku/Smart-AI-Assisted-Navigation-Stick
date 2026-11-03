@@ -1,0 +1,17 @@
+[Unit]
+Description=Smart AI Navigation Stick - Raspberry Pi Edge Client
+After=network.target sound.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/Smart-Blind-Stick
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 -m edge.main --server http://192.168.1.100:5000
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
